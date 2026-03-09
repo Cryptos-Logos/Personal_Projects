@@ -1,0 +1,27 @@
+main - 14 october --------------------------------
+ for T in range(0,1):
+    amp=1
+    f=15
+    fs=10*f
+    B=10
+    m_t,t = infosource("sinc",f,fs,amp,T)
+    print(f"the first p of time is {t[0]}")
+    m=2
+    n=2
+    window_index=1
+    plt.subplot(m,n,window_index)
+    window_index+=1
+    plot_time(t,m_t)
+    plt.subplot(m,n,window_index)
+    window_index+=1
+    spectrum_signal(m_t,fs)
+    h=channel("Blim",fs,m_t,B)
+    print(len(h))
+    plt.subplot(m,n,window_index)
+    window_index+=1
+    plot_time(t,h)
+    plt.subplot(m,n,window_index)
+    window_index+=1
+    spectrum_signal(h,fs)   
+    plt.show()
+

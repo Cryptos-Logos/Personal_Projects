@@ -1,0 +1,92 @@
+from plot_time import plot_time
+from infosource import infosource
+from spectrum_signal import spectrum_signal
+from filter_sinc import filter_sinc
+import matplotlib.pyplot as plt
+from tx_mod import tx_mod
+from rx_demod import rx_demod
+from channel import channel
+import numpy as np
+import sounddevice as sd
+from addawgn import awgn
+
+
+def main():
+    amp=1
+    f=10
+    fs=10*f
+    fc=12000
+    kf=0.4
+    m=3
+    n=2
+    window_index=1
+    rec_song=[]
+    max_sec=[]
+    m_t,t = infosource("real_time_song",f,fs,amp,0)
+    rec_song=[]
+    T=0
+    plt.close()
+    plt.figure(1)
+    for T in range(30,40):
+        plt.clf()
+        window_index=1
+        m_t,t = infosource("real_time_song",f,fs,amp,T)
+        #print(m_n_t[0:50],len(m_t),len(t))
+        fs=1/(t[1]-t[0])
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        plt.plot(t,m_t)
+        plt.title("Original Message")
+        plt.xlabel("Time")
+        plt.ylabel("Amplitude")
+        plt.tight_layout()
+
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        spectrum_signal(m_t,fs)
+
+        x_t=tx_mod('LSSB',m_t,fc,kf,fs,t)
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        plt.plot(t,x_t)
+        plt.xlabel("Time (s)")
+        plt.ylabel("Amplitude (norm.)")
+        plt.title(f"Modulate signal")
+        plt.tight_layout()
+        
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        spectrum_signal(x_t,fs)
+
+        m_hat_t=rx_demod('SD',x_t,fc,fs,kf,t)
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        plt.plot(t,m_hat_t)
+        plt.subplot(m,n,window_index)
+        window_index+=1
+        spectrum_signal(m_hat_t,fs)
+        rec_song=rec_song+[m_hat_t]
+        plt.show(block=0)
+        plt.pause(0.2)
+    rec_song=np.ndarray.flatten(np.array(rec_song))
+    sd.play(rec_song/26270, fs)
+    sd.wait()
+    # if(print_1):
+    #     print("The message signal is :",m_t)ṇ
+    #     print("Name sent is Konaark")
+    #     print_1=0
+    # print("The reconstructed signal is :",recon)
+    # print(f"Current Variance is {sigma_sqaure_list[sigma_index]}")
+    # BER=0
+    # for i in range(len(m_t)):ṁ
+    #     if m_t[i]!=recon[i]:
+    #         BER+=1
+    # print("Bit error rate is ",BER/len(m_t))
+    # # byte_chunks = [recon[i:i+8] for i in range(0, len(m_t), 8)]
+    # # ascii_text = ''.join([chr(int(byte, 2)) for byte in byte_chunks])
+    # # print("Reconstructed name is",ascii_text)
+    # #26270
+
+
+if __name__ == "__main__":
+    main()
