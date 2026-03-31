@@ -1,0 +1,1 @@
+This is the matlab code for an assignment on image compression and encododing. It was first compressed using DCT transform, then converted to bitstream in a zig zag manner. This bitstream was then zipped using builtin command (which uses Lempel ziv algorithm). Compression of varying block sizes is also added
